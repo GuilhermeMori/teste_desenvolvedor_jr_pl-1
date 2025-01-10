@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const router = Router();
 const tasksRepository = new TasksRepository();
-const supportedLanguages = ['pt', 'en', 'es']; // Supported languages
+const supportedLanguages = ['pt', 'en', 'es']; // Idiomas suportados
 
 router.post('/', async (req: Request, res: Response) => {
   try {
@@ -49,7 +49,7 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
-// GET: List all tasks
+// GET: Lista todas as tarefas
 router.get('/', (req, res) => {
   const tasks = tasksRepository.getAllTasks();
 
@@ -60,7 +60,7 @@ router.get('/', (req, res) => {
   return res.json(tasks);
 });
 
-// GET: Get a task by ID
+// GET: Obtém uma tarefa pelo ID
 router.get('/:id', (req: Request, res: Response) => {
   const { id } = req.params;
   const task = tasksRepository.getTaskById(Number(id));
@@ -72,7 +72,7 @@ router.get('/:id', (req: Request, res: Response) => {
   return res.json(task);
 });
 
-// DELETE: Remove a task by ID
+// DELETE: Remove uma tarefa pelo ID
 router.delete('/:id', (req: Request, res: Response) => {
   const { id } = req.params;
   const task = tasksRepository.getTaskById(Number(id));

@@ -26,8 +26,8 @@ class LLMService:
         # Construção do prompt para resumo
         prompts_by_language = {
             "pt": f"Resuma o seguinte texto em português, sem usar palavras de outros idiomas:\n\n{text}",
-            # "en": f"Summarize the following text in English without using words from other languages:\n\n{text}",
-            # "es": f"Resume el siguiente texto en español, sin usar palabras de otros idiomas:\n\n{text}",
+            "en": f"Summarize the following text in English without using words from other languages:\n\n{text}",
+            "es": f"Resume el siguiente texto en español, sin usar palabras de otros idiomas:\n\n{text}",
         }
 
 
