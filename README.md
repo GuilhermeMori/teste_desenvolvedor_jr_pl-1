@@ -34,8 +34,8 @@ O resumo gerado é salvo com o texto original e a versao resumida e traduzido co
    ```
 4. Inicie a API Node.js e o serviço Python:
    ```bash
-   ./setup.sh start-node
-   ./setup.sh start-python
+   ./setup.sh dev-node
+   ./setup.sh dev-python
    ```
 5. A API estará disponível em `http://localhost:3005`.
 
@@ -103,6 +103,7 @@ Um "médico centauro + um sistema de IA" melhora as decisões que os humanos tom
 
 O médico sempre será quem aperta o botão final; e o juiz quem determina se uma sentença é justa.
 ```
+
 FONTE: https://www.bbc.com/portuguese/articles/c2kx2e74jyxo
 
 # Desejamos um bom desafio! 🚀

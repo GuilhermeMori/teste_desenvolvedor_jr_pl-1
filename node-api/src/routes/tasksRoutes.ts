@@ -1,42 +1,91 @@
-import { Router, Request, Response } from "express";
-import { TasksRepository } from "../repositories/tasksRepository";
+import { Router, Request, Response } from 'express';
+import { TasksRepository } from '../repositories/tasksRepository';
+import axios from 'axios';
 
 const router = Router();
 const tasksRepository = new TasksRepository();
+const supportedLanguages = ['pt', 'en', 'es']; // Supported languages
 
-// POST: Cria uma tarefa e solicita resumo ao serviço Python
-router.post("/", async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
-    const { text } = req.body;
-    if (!text) {
-      return res.status(400).json({ error: 'Campo "text" é obrigatório.' });
+    const { text, lang } = req.body;
+
+    if (!text || !lang) {
+      return res
+        .status(400)
+        .json({ error: 'The fields "text" and "lang" are required.' });
     }
 
-    // Cria a "tarefa"
-    const task = tasksRepository.createTask(text);
+    if (!supportedLanguages.includes(lang)) {
+      return res.status(400).json({ error: 'Language not supported' });
+    }
 
-    // Deve solicitar o resumo do texto ao serviço Python
-    const summary = "Resumo da tarefa";
+    const task = tasksRepository.createTask(text, lang);
 
-    // Atualiza a tarefa com o resumo
+    const pythonServiceUrl = 'http://localhost:8000/summarize';
+
+    const response = await axios.post(pythonServiceUrl, { text, lang });
+
+    const summary = response.data.summary;
+
     tasksRepository.updateTask(task.id, summary);
 
     return res.status(201).json({
-      message: "Tarefa criada com sucesso!",
-      task: tasksRepository.getTaskById(task.id),
+      message: `Task #${task.id} created successfully!`,
     });
-  } catch (error) {
-    console.error("Erro ao criar tarefa:", error);
+  } catch (error: any) {
+    console.error('Error creating task:', error.message || error);
+
+    if (error.response) {
+      console.error('Python service error response:', error.response.data);
+      return res.status(error.response.status).json({
+        error: error.response.data.detail || 'Python service error',
+      });
+    }
+
     return res
       .status(500)
-      .json({ error: "Ocorreu um erro ao criar a tarefa." });
+      .json({ error: 'An error occurred while creating the task.' });
   }
 });
 
-// GET: Lista todas as tarefas
-router.get("/", (req, res) => {
+// GET: List all tasks
+router.get('/', (req, res) => {
   const tasks = tasksRepository.getAllTasks();
+
+  if (tasks.length === 0) {
+    return res.status(404).json({ message: 'No tasks found.' });
+  }
+
   return res.json(tasks);
+});
+
+// GET: Get a task by ID
+router.get('/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const task = tasksRepository.getTaskById(Number(id));
+
+  if (!task) {
+    return res.status(404).json({ error: 'Task not found.' });
+  }
+
+  return res.json(task);
+});
+
+// DELETE: Remove a task by ID
+router.delete('/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const task = tasksRepository.getTaskById(Number(id));
+
+  if (!task) {
+    return res.status(404).json({ error: 'Task not found.' });
+  }
+
+  tasksRepository.deleteTask(Number(id));
+
+  return res.status(200).json({
+    message: `Task #${task.id} deleted successfully!`,
+  });
 });
 
 export default router;
